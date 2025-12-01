@@ -595,9 +595,9 @@ function RenovaCore() {
   const [lang, setLang] = useState<'en' | 'zh'>('en'); 
   const [viewMode, setViewMode] = useState<'landing' | 'public' | 'admin'>('landing');
   const [currentUser, setCurrentUser] = useState(null); 
-  const [activeTab, setActiveTab] = useState<'dashboard'|'inventory'|'return'|'activity'|'admin'>('inventory');
+  const [activeTab, setActiveTab] = useState('inventory');
   const [darkMode, setDarkMode] = useState(false);
-  const [notifications, setNotifications] = useState<{id:number;type:'success'|'error';message:string}[]>([]);
+  const [notifications, setNotifications] = useState([]);
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   
   // Data States
