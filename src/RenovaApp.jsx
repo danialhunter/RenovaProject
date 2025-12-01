@@ -11,10 +11,9 @@ import {
 /**
  * RENOVA - Creative Reuse Inventory System
  * Updates:
- * - UI FIX: Added global CSS injection to remove default body margins/padding 
- * (Fixes the "white bar" on top if caused by CSS).
- * - CRASH FIX: Hardened state initialization.
- * - FEATURES: Includes Admin Edit & Local File Upload.
+ * - FULL LOCALIZATION: Added missing translations for placeholders and menus.
+ * - LOCAL UPLOAD: Enabled local file picking for item images.
+ * - UI FIXES: Polished form layouts.
  */
 
 // --- Constants ---
@@ -62,26 +61,31 @@ const TRANSLATIONS = {
     outOfStock: "Out of Stock",
     unavailable: "Unavailable",
     borrowModalTitle: "Borrow Item",
-    className: "Class Name",
-    classNamePlaceholder: "Filter by Class Name...",
+    className: "Class / User Name",
+    classNamePlaceholder: "Who is borrowing this?",
     purpose: "Purpose / Activity",
     purposePlaceholder: "What will you make?",
     confirmBorrow: "Confirm Borrow",
     cancel: "Cancel",
     returnModalTitle: "Return Item",
     story: "Activity Story / Feedback",
-    storyPlaceholder: "How was the material used?",
-    uploadImage: "Upload Photo (Required)",
+    storyPlaceholder: "How did the project go?",
+    uploadImage: "Upload Photo (Optional)",
     confirmReturn: "Confirm Return",
     addItem: "Add New Item",
     editItem: "Edit Item",
     saveChanges: "Save Changes",
     itemName: "Item Name",
+    itemNamePlaceholder: "e.g. Cardboard Tubes",
     category: "Category",
     quantity: "Quantity",
     location: "Location",
+    locationPlaceholder: "e.g. Bin A1",
     description: "Description",
-    imageUpload: "Upload Image",
+    descriptionPlaceholder: "Brief details about the item...",
+    imageUpload: "Item Image",
+    clickUpload: "Click to upload from computer",
+    removeImage: "Remove Image",
     logout: "Exit Mode",
     borrowed: "borrowed",
     returned: "returned",
@@ -149,26 +153,31 @@ const TRANSLATIONS = {
     outOfStock: "缺货",
     unavailable: "不可用",
     borrowModalTitle: "借用物品",
-    className: "班级名称",
-    classNamePlaceholder: "按班级名称筛选...",
+    className: "班级 / 用户名",
+    classNamePlaceholder: "谁在借用此物品？",
     purpose: "用途 / 活动",
-    purposePlaceholder: "你们将制作什么？",
+    purposePlaceholder: "你打算制作什么？",
     confirmBorrow: "确认借用",
     cancel: "取消",
     returnModalTitle: "归还物品",
     story: "活动反馈 / 故事",
-    storyPlaceholder: "材料是如何使用的？",
-    uploadImage: "上传照片 (必须)",
+    storyPlaceholder: "项目进行得如何？",
+    uploadImage: "上传照片 (可选)",
     confirmReturn: "确认归还",
     addItem: "添加新物品",
     editItem: "编辑物品",
     saveChanges: "保存更改",
     itemName: "物品名称",
+    itemNamePlaceholder: "例如：纸板管",
     category: "分类",
     quantity: "数量",
     location: "位置",
+    locationPlaceholder: "例如：A1 箱",
     description: "描述",
-    imageUpload: "上传图片",
+    descriptionPlaceholder: "关于物品的简要描述...",
+    imageUpload: "物品图片",
+    clickUpload: "点击上传本地图片",
+    removeImage: "移除图片",
     logout: "退出模式",
     borrowed: "借用了",
     returned: "归还了",
@@ -311,7 +320,7 @@ const Modal = ({ children, onClose, title }) => (
 // --- FORMS ---
 
 // Combined Form for Adding and Editing Items
-const ItemForm = ({ initialData, onSubmit, onCancel, mode = "add" }) => {
+const ItemForm = ({ initialData, onSubmit, onCancel, mode = "add", t }) => {
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
     category: initialData?.category || CATEGORIES[0],
@@ -342,15 +351,15 @@ const ItemForm = ({ initialData, onSubmit, onCancel, mode = "add" }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Input 
-        label="Item Name" 
+        label={t('itemName')} 
         value={formData.name} 
         onChange={e => setFormData({...formData, name: e.target.value})} 
         required 
-        placeholder="e.g. Cardboard Tubes" 
+        placeholder={t('itemNamePlaceholder')}
       />
       
       <div>
-        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Category</label>
+        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('category')}</label>
         <select
           value={formData.category}
           onChange={e => setFormData({...formData, category: e.target.value})}
@@ -363,34 +372,34 @@ const ItemForm = ({ initialData, onSubmit, onCancel, mode = "add" }) => {
       <div className="grid grid-cols-2 gap-4">
         <Input 
           type="number" 
-          label="Quantity" 
+          label={t('quantity')} 
           min="1" 
           value={formData.quantity} 
           onChange={e => setFormData({...formData, quantity: parseInt(e.target.value)})} 
           required 
         />
         <Input 
-          label="Location" 
+          label={t('location')} 
           value={formData.location} 
           onChange={e => setFormData({...formData, location: e.target.value})} 
           required 
-          placeholder="e.g. Bin A1" 
+          placeholder={t('locationPlaceholder')} 
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Description</label>
+        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('description')}</label>
         <textarea
           value={formData.description}
           onChange={e => setFormData({...formData, description: e.target.value})}
           className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e93949] outline-none transition-all"
           rows="3"
-          placeholder="Brief details about the item..."
+          placeholder={t('descriptionPlaceholder')}
         />
       </div>
 
       <div>
-        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">Item Image</label>
+        <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5 block">{t('imageUpload')}</label>
         <div className="p-4 bg-slate-100 dark:bg-slate-700 rounded-lg border-2 border-dashed border-slate-300 dark:border-slate-600 hover:border-[#e93949] transition-colors relative">
            <input 
              type="file" 
@@ -405,27 +414,27 @@ const ItemForm = ({ initialData, onSubmit, onCancel, mode = "add" }) => {
                </div>
              ) : (
                <div className="flex items-center gap-2 text-slate-500 py-4">
-                  <Upload size={20} /> <span className="font-medium">Click to upload from computer</span>
+                  <Upload size={20} /> <span className="font-medium">{t('clickUpload')}</span>
                </div>
              )}
            </div>
         </div>
         {formData.image && (
           <button type="button" onClick={clearImage} className="text-xs text-red-500 mt-2 hover:underline w-full text-center">
-            Remove Image
+            {t('removeImage')}
           </button>
         )}
       </div>
 
       <div className="flex gap-3 pt-4">
-        <Button onClick={onCancel} variant="secondary" className="flex-1">Cancel</Button>
-        <Button type="submit" className="flex-1">{mode === "edit" ? "Save Changes" : "Add Item"}</Button>
+        <Button onClick={onCancel} variant="secondary" className="flex-1">{t('cancel')}</Button>
+        <Button type="submit" className="flex-1">{mode === "edit" ? t('saveChanges') : t('addItem')}</Button>
       </div>
     </form>
   );
 };
 
-const BorrowForm = ({ item, onSubmit, onCancel }) => {
+const BorrowForm = ({ item, onSubmit, onCancel, t }) => {
   const [name, setName] = useState('');
   const [reason, setReason] = useState('');
 
@@ -447,27 +456,27 @@ const BorrowForm = ({ item, onSubmit, onCancel }) => {
             <div className="text-sm text-slate-500">{item.location}</div>
         </div>
       </div>
-      <Input label="Class / User Name" value={name} onChange={e => setName(e.target.value)} required placeholder="Who is borrowing this?" />
+      <Input label={t('className')} value={name} onChange={e => setName(e.target.value)} required placeholder={t('classNamePlaceholder')} />
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Purpose</label>
+        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('purpose')}</label>
         <textarea
           value={reason}
           onChange={e => setReason(e.target.value)}
           required
           className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e93949] outline-none"
-          placeholder="What will you make?"
+          placeholder={t('purposePlaceholder')}
           rows="3"
         />
       </div>
       <div className="flex gap-3 pt-2">
-        <Button onClick={onCancel} variant="secondary" className="flex-1">Cancel</Button>
-        <Button type="submit" className="flex-1">Confirm Borrow</Button>
+        <Button onClick={onCancel} variant="secondary" className="flex-1">{t('cancel')}</Button>
+        <Button type="submit" className="flex-1">{t('confirmBorrow')}</Button>
       </div>
     </form>
   );
 };
 
-const ReturnForm = ({ loan, onSubmit, onCancel }) => {
+const ReturnForm = ({ loan, onSubmit, onCancel, t }) => {
     const [story, setStory] = useState('');
     const [image, setImage] = useState(null);
   
@@ -484,18 +493,18 @@ const ReturnForm = ({ loan, onSubmit, onCancel }) => {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Story / Feedback</label>
+          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('story')}</label>
           <textarea
             value={story}
             onChange={e => setStory(e.target.value)}
             className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:ring-2 focus:ring-[#e93949] outline-none"
-            placeholder="How did the project go?"
+            placeholder={t('storyPlaceholder')}
             rows="3"
           />
         </div>
 
         <div className="flex flex-col gap-1.5">
-           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Upload Photo (Optional)</label>
+           <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('uploadImage')}</label>
            <input 
              type="file" 
              accept="image/*"
@@ -510,8 +519,8 @@ const ReturnForm = ({ loan, onSubmit, onCancel }) => {
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Button onClick={onCancel} variant="secondary" className="flex-1">Cancel</Button>
-          <Button type="submit" variant="primary" className="flex-1 bg-emerald-600 hover:bg-emerald-700">Confirm Return</Button>
+          <Button onClick={onCancel} variant="secondary" className="flex-1">{t('cancel')}</Button>
+          <Button type="submit" variant="primary" className="flex-1 bg-emerald-600 hover:bg-emerald-700">{t('confirmReturn')}</Button>
         </div>
       </form>
     );
@@ -529,7 +538,6 @@ export default function RenovaApp() {
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
   
   // Data States
-  // FIX: Explicitly check for Array.isArray in all initializers to prevent "prev is not iterable" crash
   const [inventory, setInventory] = useState(() => {
     try {
       const saved = localStorage.getItem('renova_inventory');
@@ -996,6 +1004,7 @@ export default function RenovaApp() {
                 setBorrowModalOpen(false);
               }}
               onCancel={() => setBorrowModalOpen(false)}
+              t={t}
             />
           </Modal>
         )}
@@ -1009,6 +1018,7 @@ export default function RenovaApp() {
                 setAddItemModalOpen(false);
               }}
               onCancel={() => setAddItemModalOpen(false)}
+              t={t}
             />
           </Modal>
         )}
@@ -1023,6 +1033,7 @@ export default function RenovaApp() {
                 setEditItemModalOpen(false);
               }}
               onCancel={() => setEditItemModalOpen(false)}
+              t={t}
             />
           </Modal>
         )}
@@ -1111,6 +1122,7 @@ export default function RenovaApp() {
                 setReturnModalOpen(false);
               }}
               onCancel={() => setReturnModalOpen(false)}
+              t={t}
             />
           </Modal>
         )}
@@ -1371,49 +1383,6 @@ export default function RenovaApp() {
     );
   };
 
-  const DashboardView = () => {
-    // Safety check: ensure arrays exist
-    const safeInventory = Array.isArray(inventory) ? inventory : [];
-    const safeLoans = Array.isArray(activeLoans) ? activeLoans : [];
-
-    const totalItems = safeInventory.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
-    const totalLoans = safeLoans.length;
-
-    return (
-      <div className="space-y-8 font-sans pb-10">
-        <div className="flex justify-between items-end">
-          <div>
-            <h2 className="text-3xl font-bold text-slate-800 dark:text-white tracking-tight mb-1">{t('dashboard')}</h2>
-            <p className="text-slate-500 dark:text-slate-400">{getOrgName()}</p>
-          </div>
-          <span className="text-slate-400 dark:text-slate-500 text-sm font-medium bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-full">{new Date().toLocaleDateString()}</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Card className="p-6 border-l-4 border-l-[#e93949] hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-               <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('totalStock')}</h3>
-               <div className="p-3 bg-[#e93949]/10 text-[#e93949] rounded-xl">
-                 <Package size={24} />
-               </div>
-            </div>
-            <AutoScaleText text={totalItems.toLocaleString()} className="text-slate-900 dark:text-white" />
-          </Card>
-          
-          <Card className="p-6 border-l-4 border-l-[#ecb282] hover:shadow-lg transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-               <h3 className="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('itemsOut')}</h3>
-               <div className="p-3 bg-[#ecb282]/20 text-orange-700 rounded-xl">
-                 <RotateCcw size={24} />
-               </div>
-            </div>
-            <AutoScaleText text={totalLoans} className="text-slate-900 dark:text-white" />
-          </Card>
-        </div>
-      </div>
-    );
-  };
-
   // -- Main Layout --
   
   if (viewMode === 'landing') return <LandingView />;
@@ -1509,6 +1478,13 @@ export default function RenovaApp() {
                   className="flex-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 flex justify-center transition-colors"
                 >
                   {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+                </button>
+                <button 
+                  onClick={() => setLang(lang === 'en' ? 'zh' : 'en')} 
+                  className="flex-1 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 flex justify-center transition-colors font-bold"
+                  title="Switch Language"
+                >
+                  {lang === 'en' ? 'CN' : 'EN'}
                 </button>
                 <button 
                   onClick={handleLogout}
