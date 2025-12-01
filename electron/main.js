@@ -6,46 +6,41 @@ if (require('electron-squirrel-startup')) {
   app.quit();
 }
 
-function createWindow() {
+const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1280,
+    width: 1200,
     height: 800,
+    icon: path.join(__dirname, '../public/icon.png'), // Use icon if available
     webPreferences: {
       nodeIntegration: true,
-      contextIsolation: false, // For simple local apps; allows basic interactions
+      contextIsolation: false, // Simplified for this project structure
+      webSecurity: false // Allows loading local resources easily
     },
-    title: "Renova Recycle Center",
-    // icon: path.join(__dirname, '../public/icon.png') // Uncomment if you add an icon
   });
 
-  // In development, we load the Vite dev server
-  // In production (built app), we load the index.html from the dist folder
-  const isDev = !app.isPackaged;
+  // Check if we are in dev mode or production
+  // In production, the app is in resources/app.asar, so we look for dist/index.html
+  const startUrl = process.env.NODE_ENV === 'development' 
+    ? 'http://localhost:5173' 
+    : `file://${path.join(__dirname, '../dist/index.html')}`;
 
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:5173');
-    // mainWindow.webContents.openDevTools(); // Open DevTools for debugging
-  } else {
-    mainWindow.loadFile(path.join(__dirname, '../dist/index.html'));
-  }
-  
-  // Remove the default menu bar for a cleaner "Kiosk" look
+  mainWindow.loadURL(startUrl);
+
+  // Remove menu bar for cleaner look
   mainWindow.setMenuBarVisibility(false);
-}
+};
 
-app.whenReady().then(() => {
-  createWindow();
-
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
-});
+app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
   }
 });
