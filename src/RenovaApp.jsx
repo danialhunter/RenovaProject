@@ -594,7 +594,7 @@ const ReturnForm = ({ loan, onSubmit, onCancel, t }) => {
 function RenovaCore() {
   const [lang, setLang] = useState<'en' | 'zh'>('en'); 
   const [viewMode, setViewMode] = useState<'landing' | 'public' | 'admin'>('landing');
-  const [currentUser, setCurrentUser] = useState(null as null | {id:string;name:string;role:string;username:string;password:string}); 
+  const [currentUser, setCurrentUser] = useState(null); 
   const [activeTab, setActiveTab] = useState<'dashboard'|'inventory'|'return'|'activity'|'admin'>('inventory');
   const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState<{id:number;type:'success'|'error';message:string}[]>([]);
